@@ -16,8 +16,8 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_value(self):
-        actual = HTMLNode(tag="<a>", value="this is not the value", props={"href": "https://www.google.com", "target": "_blank"})
-        expected = HTMLNode(tag="<a>", value="this is the value", props={"href": "https://www.google.com", "target": "_blank"})
+        actual = HTMLNode(tag="a", value="this is not the value", props={"href": "https://www.google.com", "target": "_blank"})
+        expected = HTMLNode(tag="a", value="this is the value", props={"href": "https://www.google.com", "target": "_blank"})
         self.assertNotEqual(actual.value, expected.value)
         
 
