@@ -2,7 +2,6 @@ import unittest
 
 from textnode import TextNode
 
-
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         node = TextNode("This is a text node", "bold")
@@ -18,9 +17,6 @@ class TestTextNode(unittest.TestCase):
         actual = TextNode("text node", "bold", " ")
         expected = TextNode("text node", "italic", " ")
         self.assertNotEqual(actual, expected)
-        
-
-        
 
 
 if __name__ == "__main__":
