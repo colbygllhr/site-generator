@@ -5,6 +5,14 @@ text_type_code = "code"
 text_type_link = "link"
 text_type_image = "image"
 
+valid_text_types = [
+    text_type_text,
+    text_type_bold,
+    text_type_italic,
+    text_type_code,
+    text_type_link,
+    text_type_image
+]
 
 class TextNode:
     def __init__(self, text, text_type, url=None, alt=None):
