@@ -25,7 +25,6 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 other_type_node = TextNode(string, text_type)
                 nodes.append(other_type_node)
             
-        
         new_nodes.extend(nodes)
 
     return new_nodes
@@ -46,7 +45,7 @@ def split_nodes_image(old_nodes):
 
     new_nodes = []
     for node in old_nodes:
-        if node.text_type != "text":
+        if node.text_type != text_type_text:
             new_nodes.append(node)
             continue
         
@@ -58,7 +57,7 @@ def split_nodes_image(old_nodes):
         remaining_text = node.text
         for alt, url in images:
             delimiter = f"![{alt}]({url})"
-            parts = node.text.split(delimiter, 1)
+            parts = remaining_text.split(delimiter, 1)
 
             if parts[0]:
                 new_nodes.append(TextNode(parts[0], text_type_text))
@@ -79,7 +78,8 @@ def split_nodes_link(old_nodes):
     
     new_nodes = []
     for node in old_nodes:
-        if node.text_type != "text":
+        remaining_text = node.text
+        if node.text_type != text_type_text:
             new_nodes.append(node)
             continue
         
@@ -88,12 +88,10 @@ def split_nodes_link(old_nodes):
         if not links:
             new_nodes.append(node)
             continue
-        
-        remaining_text = node.text
 
         for desc, url in links:
             delimiter = f"[{desc}]({url})"
-            parts = node.text.split(delimiter, 1)
+            parts = remaining_text.split(delimiter, 1)
 
             if parts[0]:
                 new_nodes.append(TextNode(parts[0], text_type_text))
@@ -110,19 +108,46 @@ def split_nodes_link(old_nodes):
 
     return new_nodes
 
-    
+def text_to_textnodes(text):
 
+    paragraphs = text.split('\n\n')  # Split on double newlines for paragraphs
+    all_nodes = []
 
+    for paragraph in paragraphs:
 
- 
-    
+        nodes = [TextNode(paragraph, text_type_text)]
 
-  
+        splitting_functions = [
+            split_nodes_image,
+            split_nodes_link,
+            lambda nodes: split_nodes_delimiter(nodes, '**', text_type_bold),
+            lambda nodes: split_nodes_delimiter(nodes, '*', text_type_italic),
+            lambda nodes: split_nodes_delimiter(nodes, '`', text_type_code),
+        ]
 
-
-
-
+        for split_func in splitting_functions:
+            new_nodes = []
+            for node in nodes:
+                if node.text == None:
+                    raise ValueError("Invalid text value 'None'")
+                
+                if node.text == "":
+                    raise ValueError("Invalid empty text value")
+                
+                if node.text_type == text_type_text:
+                    new_nodes.extend(split_func([node]))
+                else:
+                    new_nodes.append(node)
+            nodes = new_nodes
+            
         
+        all_nodes.extend(nodes)
+
+    return all_nodes
 
 
 
+
+
+
+    
