@@ -1,5 +1,6 @@
 from textnode import *
 from htmlnode import *
+from inline import *
 
 def markdown_to_blocks(markdown):
     lines = markdown.split('\n\n') # Double newline to specify paragraph
@@ -49,18 +50,92 @@ def block_to_block_type(block):
     
     return "paragraph"
 
+def text_to_children(type):
+
+    type_node = text_to_textnodes(type)
+
+    html_node_list = text_node_to_html_node(type_node)
+
+    return html_node_list
+
+
 def markdown_to_html_node(markdown):
 
     blocks = markdown_to_blocks(markdown)
+    nodes = [] 
 
+    def process_ordered_list(content):
+        lines = content.split("\n")
+        list_items = []
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if line[0].isdigit() and ". " in line:
+                _, content = line.split(". ", 1)
+                item = HTMLNode("li", None, text_to_children(content))
+                list_items.append(item)
+    
+        ol_node = HTMLNode("ol", None, list_items)
+        return ol_node
+    
+    def process_unordered_list(content):
+        lines = content.split("\n")
+        list_items = []
+        for line in lines:
+            line.strip()
+            if not line:
+                continue
+            if line[0] == '*' or line[0] == '-':
+                content = line.split(" ")
+                item = HTMLNode("li", None, text_to_children(content))
+                list_items.append(item)
+
+        ul_node = HTMLNode("ul", None, text_to_children(content))
+        return ul_node
+       
     for block in blocks:
         block_type = block_to_block_type(block)
+
+        if block_type == "quote": 
+            quote_node = HTMLNode("blockquote", block)
+            nodes.append(quote_node)
+
         if block_type == "code":
             code_node = HTMLNode("code", block)
             pre_node = HTMLNode("pre", block, code_node)
-            
+            nodes.append(pre_node)
+        
+        if block_type == "ordered_list":
+            node = process_ordered_list(block)
+            nodes.append(node)
+        
+        if block_type == "unordered_list":
+            node = process_unordered_list(block)
+            nodes.append(node)
 
 
+        if block_type == "heading":
+            counter = 0
+            for character in block:
+                    counter += 1
+                    heading_node = HTMLNode(f"h{counter}", block)
+                    nodes.append(heading_node)   
+
+        if block_type == "paragraph":
+            children = text_to_children(block)
+            para_node = HTMLNode("p", None, children)
+            nodes.append(para_node)
+        
+        parent_node = HTMLNode("div", children=nodes)
+
+        return parent_node
+        
+
+
+
+
+                 
     
 
 
