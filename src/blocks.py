@@ -51,12 +51,14 @@ def block_to_block_type(block):
     return "paragraph"
 
 def text_to_children(type):
+    text_nodes = text_to_textnodes(type)
+    children = []
 
-    type_node = text_to_textnodes(type)
+    for node in text_nodes:
+        html_node = text_node_to_html_node(node)
+        children.append(html_node)
 
-    html_node_list = text_node_to_html_node(type_node)
-
-    return html_node_list
+    return children
 
 
 def markdown_to_html_node(markdown):
@@ -86,8 +88,8 @@ def markdown_to_html_node(markdown):
             line.strip()
             if not line:
                 continue
-            if line[0] == '*' or line[0] == '-':
-                content = line.split(" ")
+            if line.startswith('* ') or line.startswith('- '):
+                content = line[2:]  # Remove the '* ' or '- '
                 item = HTMLNode("li", None, text_to_children(content))
                 list_items.append(item)
 
@@ -114,32 +116,17 @@ def markdown_to_html_node(markdown):
             node = process_unordered_list(block)
             nodes.append(node)
 
-
         if block_type == "heading":
-            counter = 0
-            for character in block:
-                    counter += 1
-                    heading_node = HTMLNode(f"h{counter}", block)
-                    nodes.append(heading_node)   
+            level = block.count('#')
+            content = block.lstrip('#').strip()
+            heading_node = HTMLNode(f"h{level}", None, text_to_children(content))
+            nodes.append(heading_node)  
 
         if block_type == "paragraph":
             children = text_to_children(block)
             para_node = HTMLNode("p", None, children)
             nodes.append(para_node)
         
-        parent_node = HTMLNode("div", children=nodes)
+    parent_node = HTMLNode("div", children=nodes)
 
-        return parent_node
-        
-
-
-
-
-                 
-    
-
-
-
-
-
-    
+    return parent_node
