@@ -1,6 +1,7 @@
 import re
 from textnode import *
 
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
     new_nodes = []
@@ -109,11 +110,12 @@ def split_nodes_link(old_nodes):
     return new_nodes
 
 def text_to_textnodes(text):
-
     paragraphs = text.split('\n\n')  # Split on double newlines for paragraphs
     all_nodes = []
 
     for paragraph in paragraphs:
+        if not paragraph.strip():  # Skip empty paragraphs
+            continue
 
         nodes = [TextNode(paragraph, text_type_text)]
 
@@ -128,26 +130,16 @@ def text_to_textnodes(text):
         for split_func in splitting_functions:
             new_nodes = []
             for node in nodes:
-                if node.text == None:
+                if node.text is None:
                     raise ValueError("Invalid text value 'None'")
-                
-                if node.text == "":
-                    raise ValueError("Invalid empty text value")
                 
                 if node.text_type == text_type_text:
                     new_nodes.extend(split_func([node]))
                 else:
                     new_nodes.append(node)
             nodes = new_nodes
-            
         
         all_nodes.extend(nodes)
 
     return all_nodes
 
-
-
-
-
-
-    

@@ -42,14 +42,15 @@ class LeafNode(HTMLNode):
      
      def __init__(self, tag, value, props=None):
           
-          super().__init__(tag, value, props)
+          super().__init__(tag, value, None, props)
      
      def to_html(self):
+          if self.tag is None:
+            return self.value if self.value is not None else ""
           
           built_string = ""
 
-          if not self.value:
-               raise ValueError("Leaf nodes must have a value")
+          
           
           if not self.tag:
                return self.value
@@ -103,7 +104,7 @@ def text_node_to_html_node(text_node):
 
 
     if text_node.text_type == text_type_text:
-        return LeafNode(value=text_node.text)
+        return LeafNode(tag=None, value=text_node.text)
     elif text_node.text_type == text_type_bold:
         return LeafNode(tag='b', value=text_node.text)
     elif text_node.text_type == text_type_italic:
@@ -113,7 +114,7 @@ def text_node_to_html_node(text_node):
     elif text_node.text_type == text_type_link:
         return LeafNode(tag='a', value=text_node.text, props={"href": text_node.url})
     elif text_node.text_type == text_type_image:
-        return LeafNode(tag="img", value="", props={"src", text_node.url, "alt", text_node.alt})
+        return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text})
     else:
         raise Exception("Invalid text type.")
    

@@ -2,6 +2,7 @@ import unittest
 
 from inline import *
 from textnode import *
+from main import extract_title
 
 class TestInline(unittest.TestCase):
 
@@ -75,6 +76,13 @@ class TestInline(unittest.TestCase):
             TextNode("link", text_type_link, "https://boot.dev"),
         ]
         self.assertEqual(actual, expected)
+    
+    def test_extract_title(self):
+        paragraph = "# Hello\nMy name is\nWait for it...\nJeff."
+        actual = extract_title(paragraph)
+        expected = "Hello"
+        self.assertEqual(actual, expected)
+
 
 
 
